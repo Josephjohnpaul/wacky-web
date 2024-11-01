@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Tic Tac Toe</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f0f0f0; }
+        .main-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; width: 60vw; height: 60vw; max-width: 600px; max-height: 600px; position: relative; }
+        .sub-board { display: grid; grid-template-columns: repeat(3, 1fr); border: 2px solid #333; position: relative; }
+        .cell { display: flex; justify-content: center; align-items: center; font-size: 1.5em; border: 1px solid #aaa; width: 100%; height: 100%; cursor: pointer; }
+        .disabled { pointer-events: none; background-color: #ccc; }
+        .win-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 2em; color: rgba(0,0,0,0.7); background-color: rgba(255, 255, 255, 0.8); }
+        #message { position: fixed; top: 20px; font-size: 1.5em; color: #333; }
+    </style>
+</head>
+<body>
+    <div id="message"></div>
+    <div class="main-board" id="main-board"></div>
+
+    <script>
+        class UltimateTicTacToe {
+            constructor() {
+                this.mainBoard = Array(3).fill(null).map(() => Array(3).fill(null));
+                this.currentPlayer = 'X';
+                this.nextSubBoard = null;
+                this.isAIEnabled = true; // Set to true to enable the bot
+                this.gameOver = false;
+                this.initializeBoard();
+            }
+
+            initializeBoard() {
+                const mainBoardDiv = document.getElementById('main-board');
+                mainBoardDiv.innerHTML = '';
+
+                for (let row = 0; row < 3; row++) {
+                    for (let col = 0; col < 3; col++) {
+                        const subBoard = this.createSubBoard(row, col);
+                        mainBoardDiv.appendChild(subBoard);
+                    }
+                }
+            }
+
+            createSubBoard(mainRow, mainCol) {
+                const subBoardDiv = document.createElement('div');
+                subBoardDiv.classList.add('sub-board');
+                subBoardDiv.dataset.row = mainRow;
+                subBoardDiv.dataset.col = mainCol;
+
+                for (let row = 0; row < 3; row++) {
+                    for (let col = 0; col < 3; col++) {
+                        const cell = document.createElement('div');
+                        cell.classList.add('cell');
+                        cell.dataset.row = row;
+                        cell.dataset.col = col;
+                        cell.dataset.mainRow = mainRow;
+                        cell.dataset.mainCol = mainCol;
+                        cell.addEventListener('click', (e) => this.handleCellClick(e));
+                        subBoardDiv.appendChild(cell);
+                    }
+                }
+
+                return subBoardDiv;
+            }
+
+            handleCellClick(event) {
+                if (this.gameOver) return;
+
+                const cell = event.target;
+                const mainRow = parseInt(cell.dataset.mainRow);
+                const mainCol = parseInt(cell.dataset.mainCol);
+                const row = parseInt(cell.dataset.row);
+                const col = parseInt(cell.dataset.col);
+
+                if (cell.textContent !== '' || !this.isValidMove(mainRow, mainCol)) return;
+
+                this.makeMove(cell, mainRow, mainCol, row, col);
+                if (this.isAIEnabled && this.currentPlayer === 'O' && !this.gameOver) {
+                    setTimeout(() => this.aiMove(), 500);
+                }
+            }
+
+            isValidMove(mainRow, mainCol) {
+                // Only allow moves in the specified subboard or any non-completed board if that subboard is completed
+                return this.nextSubBoard === null || 
+                       (this.nextSubBoard[0] === mainRow && this.nextSubBoard[1] === mainCol) || 
+                       this.mainBoard[this.nextSubBoard[0]][this.nextSubBoard[1]] !== null;
+            }
+
+            makeMove(cell, mainRow, mainCol, row, col) {
+                cell.textContent = this.currentPlayer;
+                if (this.checkSubBoardWin(mainRow, mainCol, this.currentPlayer)) {
+                    this.markSubBoardWin(mainRow, mainCol);
+                    if (this.checkMainBoardWin()) {
+                        this.showEndMessage(this.currentPlayer === 'X' ? 'VICTORY' : 'DEFEAT');
+                        this.gameOver = true;
+                        return;
+                    }
+                }
+
+                this.nextSubBoard = this.mainBoard[row][col] === null ? [row, col] : null;
+                this.updateBoardState();
+                this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
+            }
+
+            checkSubBoardWin(mainRow, mainCol, player) {
+                const subBoard = document.querySelector(`.sub-board[data-row='${mainRow}'][data-col='${mainCol}']`);
+                const cells = subBoard.querySelectorAll('.cell');
+                const board = Array.from(cells).map(cell => cell.textContent);
+
+                for (let i = 0; i < 3; i++) {
+                    if (board[i * 3] === player && board[i * 3 + 1] === player && board[i * 3 + 2] === player) return true;
+                    if (board[i] === player && board[i + 3] === player && board[i + 6] === player) return true;
+                }
+                if (board[0] === player && board[4] === player && board[8] === player) return true;
+                if (board[2] === player && board[4] === player && board[6] === player) return true;
+
+                return false;
+            }
+
+            markSubBoardWin(mainRow, mainCol) {
+                const subBoard = document.querySelector(`.sub-board[data-row='${mainRow}'][data-col='${mainCol}']`);
+                subBoard.classList.add('disabled');
+                subBoard.innerHTML += `<div class="win-overlay">${this.currentPlayer}</div>`;
+                this.mainBoard[mainRow][mainCol] = this.currentPlayer;
+            }
+
+            checkMainBoardWin() {
+                const board = this.mainBoard;
+                const player = this.currentPlayer;
+
+                for (let i = 0; i < 3; i++) {
+                    if (board[i][0] === player && board[i][1] === player && board[i][2] === player) return true;
+                    if (board[0][i] === player && board[1][i] === player && board[2][i] === player) return true;
+                }
+                if (board[0][0] === player && board[1][1] === player && board[2][2] === player) return true;
+                if (board[0][2] === player && board[1][1] === player && board[2][0] === player) return true;
+
+                return false;
+            }
+
+            updateBoardState() {
+                document.querySelectorAll('.sub-board').forEach(subBoard => {
+                    const mainRow = parseInt(subBoard.dataset.row);
+                    const mainCol = parseInt(subBoard.dataset.col);
+                    subBoard.classList.toggle('disabled', 
+                        this.mainBoard[mainRow][mainCol] !== null || 
+                        (this.nextSubBoard && (this.nextSubBoard[0] !== mainRow || this.nextSubBoard[1] !== mainCol))
+                    );
+                });
+            }
+
+            aiMove() {
+                const availableBoards = this.getAvailableBoards();
+                if (!availableBoards.length) return;
+
+                const [mainRow, mainCol] = this.nextSubBoard || availableBoards[Math.floor(Math.random() * availableBoards.length)];
+                const subBoard = document.querySelector(`.sub-board[data-row='${mainRow}'][data-col='${mainCol}']`);
+                const emptyCells = Array.from(subBoard.querySelectorAll('.cell')).filter(cell => cell.textContent === '');
+
+                if (emptyCells.length > 0) {
+                    const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                    const row = parseInt(randomCell.dataset.row);
+                    const col = parseInt(randomCell.dataset.col);
+                    this.makeMove(randomCell, mainRow, mainCol, row, col);
+                }
+            }
+
+            getAvailableBoards() {
+                const availableBoards = [];
+                for (let row = 0; row < 3; row++) {
+                    for (let col = 0; col < 3; col++) {
+                        if (this.mainBoard[row][col] === null) {
+                            availableBoards.push([row, col]);
+                        }
+                    }
+                }
+                return availableBoards;
+            }
+
+            showEndMessage(result) {
+                const message = document.getElementById('message');
+                message.textContent = result === 'X' ? 'VICTORY' : 'DEFEAT huhh...?';
+            }
+        }
+
+        // Initialize the game
+        new UltimateTicTacToe();
+    </script>
+</body>
+</html>
