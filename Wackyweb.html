@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wacky Web</title>
+    <style>
+        /* Basic reset for padding and margins */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Page styling */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #2d2d2d;
+            color: #fff;
+            overflow: hidden;
+            position: relative;
+            animation: backgroundColorChange 10s infinite alternate;
+        }
+
+        /* Background color animation */
+        @keyframes backgroundColorChange {
+            0% { background-color: #2d2d2d; }
+            100% { background-color: #1b1b1b; }
+        }
+
+        /* Bouncing animation area */
+        .bouncing-logo {
+            position: absolute;
+            width: 150px;
+            height: 50px;
+            background-color: #e91e63;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            animation: bounce 4s infinite;
+        }
+
+        /* Keyframes for the bouncing animation */
+        @keyframes bounce {
+            0% { top: 0; left: 0; }
+            25% { top: 0; right: 0; }
+            50% { bottom: 0; right: 0; }
+            75% { bottom: 0; left: 0; }
+            100% { top: 0; left: 0; }
+        }
+
+        /* Button container styling */
+        .buttons {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        /* Heading text animation */
+        .buttons h1 {
+            margin-bottom: 20px;
+            font-size: 2em;
+            animation: colorShift 5s infinite alternate;
+        }
+
+        /* Buttons styling with hover animation */
+        .buttons a {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px 30px;
+            background-color: #00bcd4;
+            color: #fff;
+            text-decoration: none;
+            font-size: 1em;
+            border-radius: 5px;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+
+        .buttons a:hover {
+            background-color: #0097a7;
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        /* Fade-in animation */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Heading color shift animation */
+        @keyframes colorShift {
+            0% { color: #00bcd4; }
+            100% { color: #ffeb3b; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Bouncing Wacky Web Logo -->
+    <div class="bouncing-logo">Wacky Web</div>
+
+    <!-- Button links -->
+    <div class="buttons">
+        <h1>Welcome to Wacky Web!</h1>
+        <a href="index.html">Play Ultimate tic tac toe</a>
+        <a href="emotionalbot.html">Chat with bot talks to you in different ways</a>
+        <a href="insult.html">Chat with bot which appreciates you</a>
+        <a href="rizzbot.html">Chat with bot which will rizz you up</a>
+    </div>
+
+</body>
+</html>
