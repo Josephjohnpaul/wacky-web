@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cheesy Pickup Line Bot</title>
+    <style>
+        /* Basic styling */
+        body, html {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(120deg, #ff9a9e, #fad0c4, #fad0c4);
+            transition: background 1.5s ease;
+            overflow: hidden;
+        }
+
+        #app {
+            text-align: center;
+            width: 60%;
+            max-width: 400px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #fff;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        #pickupLine {
+            font-size: 1.5rem;
+            color: #fff;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        #pickupLine.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            color: #fff;
+            background-color: #ff6b81;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #ff4757;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <h1>Your Cheesy Pickup Line Bot</h1>
+    <p id="pickupLine"></p>
+    <button onclick="generatePickupLine()">Get a Pickup Line</button>
+</div>
+
+<script>
+    const pickupLines = [
+        "Are you a magician? Because whenever I look at you, everyone else disappears.",
+        "Do you have a map? Because I just got lost in your eyes.",
+        "If you were a vegetable, you'd be a cute-cumber!",
+        "Are you a time traveler? Because I see you in my future.",
+        "Do you have a Band-Aid? Because I just scraped my knee falling for you.",
+        "If beauty were time, you'd be an eternity.",
+        "Is your name Google? Because you have everything I’ve been searching for.",
+        "If you were a song, you’d be my favorite tune.",
+        "Are you made of copper and tellurium? Because you’re Cu-Te.",
+        "Do you have a pencil? Because I want to erase your past and write our future.",
+        "If you were a triangle, you’d be acute one."
+    ];
+
+    const usedLines = JSON.parse(localStorage.getItem('usedPickupLines')) || [];
+    
+    function generatePickupLine() {
+        const availableLines = pickupLines.filter(line => !usedLines.includes(line));
+
+        if (availableLines.length === 0) {
+            usedLines.length = 0; // Reset when all lines are used
+            localStorage.setItem('usedPickupLines', JSON.stringify(usedLines));
+            alert("You've heard all my best lines! Let's start over.");
+            return;
+        }
+
+        const randomLine = availableLines[Math.floor(Math.random() * availableLines.length)];
+        usedLines.push(randomLine);
+        localStorage.setItem('usedPickupLines', JSON.stringify(usedLines));
+        
+        const pickupLineElement = document.getElementById('pickupLine');
+        pickupLineElement.classList.remove('show'); // Hide the old line
+
+        // Trigger smooth reveal with delay
+        setTimeout(() => {
+            pickupLineElement.textContent = randomLine;
+            pickupLineElement.classList.add('show');
+
+            // Background color transition
+            document.body.style.background = `linear-gradient(120deg, ${getRandomColor()}, ${getRandomColor()})`;
+        }, 500); // Slight delay for smooth transition
+    }
+
+    function getRandomColor() {
+        const colors = ['#ff9a9e', '#fad0c4', '#fad0c4', '#a18cd1', '#fbc2eb', '#cfd9df', '#d4fc79', '#96e6a1'];
+        return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    window.onload = () => {
+        const pickupLineElement = document.getElementById('pickupLine');
+        setTimeout(() => {
+            pickupLineElement.textContent = "Click below to get a pickup line!";
+            pickupLineElement.classList.add('show');
+        }, 500);
+    };
+</script>
+
+</body>
+</html>
